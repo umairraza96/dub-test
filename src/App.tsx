@@ -10,6 +10,8 @@ import { TOPICS } from "./constants/topics.constants";
 import DubAutocomplete from "./components/ui/dub-autocomplete";
 import DubLoader from "./components/ui/dub-loader";
 import DubTextField from "./components/ui/dub-textfield";
+import { Language } from "./types/language.type";
+import { LANGUAGES } from "./constants/languages.constants";
 
 function App() {
   /*
@@ -19,13 +21,14 @@ function App() {
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [topic, setTopic] = useState<Topic>("apple");
+  const [language, setLanguage] = useState<Language>("en");
 
   const fetchArticles = useCallback(async () => {
     try {
       setIsLoading(true);
       const { data } = await HTTP<ArticlesResponse>({
         method: "GET",
-        url: `?q=${topic}`,
+        url: `?q=${topic}&sortBy=publishedAt&language=${language}`,
       });
       setArticles(data.articles);
     } catch (error) {
@@ -34,7 +37,7 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [topic]);
+  }, [topic, language]);
 
   useEffect(() => {
     fetchArticles();
@@ -49,7 +52,7 @@ function App() {
       <Header />
       <main className="main-section">
         <div className="controls-container">
-          <DubAutocomplete
+          {/* <DubAutocomplete
             options={TOPICS}
             value={topic}
             onChange={(e, value) => {
@@ -60,6 +63,20 @@ function App() {
             disablePortal
             disableClearable
             renderInput={(params) => <DubTextField {...params} label="Topic" />}
+          /> */}
+          <DubAutocomplete
+            options={LANGUAGES}
+            value={language}
+            onChange={(e, value) => {
+              if (value) {
+                setLanguage(value);
+              }
+            }}
+            disablePortal
+            disableClearable
+            renderInput={(params) => (
+              <DubTextField {...params} label="Language" />
+            )}
           />
         </div>
         {isLoading ? (
