@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
+import { AxiosError } from "axios";
 import "./App.css";
 import ArticleCard from "./components/article-card";
 import { HTTP } from "./lib/http";
 import { Article, ArticlesResponse } from "./types/articles.type";
 import { Topic } from "./types/topics.type";
-import { AxiosError } from "axios";
 import Header from "./components/header";
 import { TOPICS } from "./constants/topics.constants";
 import DubAutocomplete from "./components/ui/dub-autocomplete";
@@ -13,6 +13,7 @@ import DubTextField from "./components/ui/dub-textfield";
 import { Language } from "./types/language.type";
 import { LANGUAGES } from "./constants/languages.constants";
 import DubChip from "./components/ui/dub-chip";
+import { sub } from "date-fns";
 
 function App() {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -24,9 +25,12 @@ function App() {
   const fetchArticles = useCallback(async () => {
     try {
       setIsLoading(true);
+      const fromDate = sub(new Date(), {
+        days: 7,
+      });
       const { data } = await HTTP<ArticlesResponse>({
         method: "GET",
-        url: `?q=${topic}&sortBy=publishedAt&language=${language}`,
+        url: `?q=${topic}&publishedAt${fromDate}&sortBy=publishedAt&language=${language}`,
       });
       setArticles(data.articles);
     } catch (error) {
@@ -41,13 +45,10 @@ function App() {
     fetchArticles();
   }, [fetchArticles]);
 
-  if (error) {
-    return <div>{error}</div>;
-  }
-
   return (
-    <div className="App">
+    <div className={`App ${language === "en" ? "ltr" : "rtl"}`}>
       <Header />
+
       <main className="main-section">
         <div className="controls-container">
           <DubAutocomplete
@@ -64,6 +65,7 @@ function App() {
               <DubTextField {...params} label="Language" />
             )}
           />
+
           <div className="topic-container">
             {TOPICS.map((topicIterator, idx) => (
               <DubChip
@@ -75,6 +77,7 @@ function App() {
             ))}
           </div>
         </div>
+        {error && <div className="error-container">{error}</div>}
         {isLoading ? (
           <div className="loading-container">
             <DubLoader />
