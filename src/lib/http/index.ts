@@ -1,4 +1,4 @@
-import axios, { AxiosRequestHeaders } from "axios";
+import axios, { AxiosRequestConfig, AxiosRequestHeaders } from "axios";
 
 interface IHTTP {
   method: "GET" | "POST" | "PUT" | "DELETE";
@@ -7,11 +7,19 @@ interface IHTTP {
   headers?: AxiosRequestHeaders;
 }
 
-export function HTTP({ method, url, data, headers }: IHTTP) {
-  return axios({
+export function HTTP<T>({ method, url, data, headers }: IHTTP) {
+  const axiosConfig: AxiosRequestConfig = {
+    baseURL: "https://newsapi.org/v2/everything",
+  };
+
+  return axios<T>({
+    ...axiosConfig,
     method,
     url,
     data,
-    headers,
+    headers: {
+      ...headers,
+      "X-Api-Key": process.env.REACT_APP_NEWS_API_KEY,
+    },
   });
 }
