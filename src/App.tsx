@@ -12,11 +12,9 @@ import DubLoader from "./components/ui/dub-loader";
 import DubTextField from "./components/ui/dub-textfield";
 import { Language } from "./types/language.type";
 import { LANGUAGES } from "./constants/languages.constants";
+import DubChip from "./components/ui/dub-chip";
 
 function App() {
-  /*
-   * States
-   */
   const [articles, setArticles] = useState<Article[]>([]);
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -52,18 +50,6 @@ function App() {
       <Header />
       <main className="main-section">
         <div className="controls-container">
-          {/* <DubAutocomplete
-            options={TOPICS}
-            value={topic}
-            onChange={(e, value) => {
-              if (value) {
-                setTopic(value);
-              }
-            }}
-            disablePortal
-            disableClearable
-            renderInput={(params) => <DubTextField {...params} label="Topic" />}
-          /> */}
           <DubAutocomplete
             options={LANGUAGES}
             value={language}
@@ -78,6 +64,16 @@ function App() {
               <DubTextField {...params} label="Language" />
             )}
           />
+          <div className="topic-container">
+            {TOPICS.map((topicIterator, idx) => (
+              <DubChip
+                key={idx}
+                label={topicIterator.toLocaleUpperCase()}
+                color={topicIterator === topic ? "primary" : "default"}
+                onClick={() => setTopic(topicIterator)}
+              />
+            ))}
+          </div>
         </div>
         {isLoading ? (
           <div className="loading-container">
